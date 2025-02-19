@@ -1,8 +1,10 @@
-﻿'Alexis Villagran
-
-Option Strict On
+﻿Option Strict On
 Option Compare Binary
 Option Explicit On
+'Alexis Villagran
+
+Imports System.Diagnostics.Eventing.Reader
+
 Module RunningTotal
     'TO-DO List
     '[X] Keep track of transactions in a Function called RunningTotal()
@@ -15,20 +17,33 @@ Module RunningTotal
         Dim transactionNumber As Decimal
         Dim quit As Boolean = False
         Do
-            Console.WriteLine("Enter a transaction amount or press Q to exit")
+
+            Console.WriteLine("Enter a transaction amount")
+            Console.WriteLine("Enter Q to quit")
+            Console.WriteLine("Enter T to show the total")
+            Console.WriteLine("Enter C to clear the total")
             userInput = Console.ReadLine()
 
             Try
                 transactionNumber = CDec(userInput)
-                RunningTotal(transactionNumber)
+                RunningTotal(transactionNumber, False)
 
             Catch ex As Exception
 
-                If userInput = "q" Then
-                    quit = True
-                Else
-                    Console.WriteLine($"You entered {userInput}.")
-                End If
+                Select Case userInput
+                    Case "q"
+                        quit = True
+
+                    Case "t"
+                        Console.WriteLine($"The current total is {RunningTotal(0, False).ToString("c")}")
+
+                    Case "c"
+                        RunningTotal(0, True)
+
+                    Case Else
+                        Console.WriteLine($"You entered {userInput}.")
+
+                End Select
 
             End Try
 
@@ -36,14 +51,18 @@ Module RunningTotal
         Loop Until quit = True
 
         Console.Clear()
-        Console.WriteLine($"Here is your running total: {RunningTotal(0)}")
+        Console.WriteLine($"Here is your running total: {RunningTotal(0, False).ToString("c")}")
 
     End Sub
 
-    Function RunningTotal(currentNumber As Decimal) As Decimal
-        Static _runningTotal As Decimal
+    Function RunningTotal(Optional currentNumber As Decimal = 0, Optional clear As Boolean = False) As Decimal
+        Static _runningTotal As Decimal = 0
 
-        _runningTotal += currentNumber
+        If clear Then
+            _runningTotal = 0
+        Else
+            _runningTotal += currentNumber
+        End If
 
         Return _runningTotal
     End Function
